@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Algolia - Server presentation</title>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="revealjs/css/reveal.css">
+    <link rel="stylesheet" href="revealjs/css/theme/sky.css" id="theme">
+    <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+    <script type="text/javascript">
+        if (window.location.search.match(/print-pdf/gi)) {
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = 'revealjs/css/print/pdf.css';
+            document.getElementsByTagName('head')[0].appendChild(link);
+        }
+    </script>
+
+    <!--[if lt IE 9]>
+    <script src="revealjs/lib/js/html5shiv.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+<div class="reveal">
+    <div class="slides">
+        <section>
+            <h1>Server installation</h1>
+            <p>An unexpected Journey</p>
+        </section>
+        <section>
+            <section>
+                <h2>Current "Personnal server"</h2>
+
+            </section>
+            <section>
+                <h3>Context</h3>
+                <ul>
+                    <li>Old configuration</li>
+                    <li>Too many "failover" IP</li>
+                    <li class="fragment">More power !</li>
+                </ul>
+            </section>
+            <section>
+                <h3>Configuration</h3>
+                <ul>
+                    <li>Proxmox</li>
+                    <li>OpenVZ (On Debian)</li>
+                    <li>Haproxy</li>
+                    <li>One container by service</li>
+                </ul>
+            </section>
+        </section>
+        <section>
+            <section>
+                <h2>Needs</h2>
+                <ul>
+                    <li>Easier configuration management</li>
+                    <li>Closer to "development" spirit</li>
+                    <li>IPv6 ?</li>
+                    <li class="fragment">Have fun</li>
+                    <li class="fragment">No reliability</li>
+                </ul>
+            </section>
+            <section>
+                <h2>What I want on my server ?</h2>
+                <ul>
+                    <li>PHP hosting</li>
+                    <li>Project management</li>
+                    <li>Private Git repository</li>
+                    <li>IRC bouncer</li>
+                    <li>Mails</li>
+                    <li>Backend services (MariaDB, MongoDB...)</li>
+                    <li class="fragment strike">Seedbox</li>
+                </ul>
+            </section>
+        </section>
+        <section>
+            <section>
+                <h2>Considered</h2>
+                <ul>
+                    <li>Openstack</li>
+                    <li>Docker</li>
+                    <li>Cloud hosting</li>
+                    <li class="fragment">Proxmox</li>
+                    <li class="fragment">LXC containers</li>
+                </ul>
+            </section>
+            <section>
+                <h2>Considered configuration management</h2>
+                <ul>
+                    <li>Puppet</li>
+                    <li>Chief</li>
+                    <li>Good old scripts ?</li>
+                    <li class="fragment grow">Ansible</li>
+                </ul>
+            </section>
+        </section>
+        <section>
+            <section>
+                <h2>The <span class="fragment">IPv6</span> <span class="fragment">HELL</span></h2>
+                <img src="http://i.giphy.com/f3whKc6iXqXgk.gif" alt="Hell" class="fragment" />
+            </section>
+            <section>
+                <h3>About IPv6</h3>
+                <p>Cost of IPv4 : ~2€ by IP</p>
+                <p>Cost of IPv6 : 2<sup>64</sup> for free (18,446,744,073,709,551,616)</p>
+                <p>Can I have a server IPv6 only ?</p>
+                <img src="http://i.giphy.com/yMaLDA976YtUs.gif" alt="Nope nope nope" class="fragment" />
+            </section>
+            <section>
+                <h3>Can I have a server IPv6 only ?</h3>
+                <ul>
+                    <li>Wait, I want to clone github repository...</li>
+                    <li>Wait, I want to install a custom package repository</li>
+                    <li>Someone listening to me ???</li>
+                    <li>Oh. I can't access to my server. Thanks Orange.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>My stack is not made for IPv6 only containers.</h3>
+                <p>LXC containers in Proxmox with LXC IPv6 only and be able to route on them ? No.</p>
+            </section>
+            <section>
+                <h3>Route to the right container !</h3>
+                <ul>
+                    <li>Handle IPv6, DNS side</li>
+                    <li>NAT for the most part</li>
+                    <li>HAProxy for the other part</li>
+                </ul>
+            </section>
+        </section>
+        <section>
+            <section>
+                <h2>Configuration Management</h2>
+            </section>
+            <section>
+                <h3>Why I want Configuration management ?</h3>
+                <ul>
+                    <li>Track changes</li>
+                    <li>Consistency</li>
+                    <li>Deploy easier</li>
+                    <li>Disaster plan</li>
+                </ul>
+            </section>
+            <section>
+                <h3>Facts about Ansible</h3>
+                <ul>
+                    <li>Don't want any client</li>
+                    <li>Huge community</li>
+                    <li>... But less scripts</li>
+                    <li>Simple</li>
+                    <li>Many tutorials... If you never want to do things in the right way.</li>
+                </ul>
+            </section>
+            <section>
+                <h3>Cons</h3>
+                <ul>
+                    <li>Less powerful than tools based in other programming languages</li>
+                    <li>Introspection...</li>
+                    <li>Speed</li>
+                </ul>
+            </section>
+            <section>
+                <h3>How It's work ?</h3>
+                <ul>
+                    <li>Translate in SSH commands</li>
+                    <li>Library <- I don't have to write some Library for now</li>
+                    <li>Roles</li>
+                    <li>Inventory</li>
+                    <li>Playbooks</li>
+                </ul>
+            </section>
+            <section>
+                <h3>Demo</h3>
+                <h4>Case</h4>
+                <ul>
+                    <li>Install some basics repository and tools</li>
+                    <li>Install apache</li>
+                </ul>
+            </section>
+        </section>
+        <section>
+            <h2>End</h2>
+
+            <p>Thanks for your attention</p>
+            <p><small>(Presentation with revealJS)</small></p>
+        </section>
+    </div>
+</div>
+
+<script src="revealjs/lib/js/head.min.js"></script>
+<script src="revealjs/js/reveal.js"></script>
+
+<script>
+
+    // Full list of configuration options available here:
+    // https://github.com/hakimel/reveal.js#configuration
+    Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+
+        theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+        transition: 'concave', // default/cube/page/concave/zoom/linear/fade/none
+
+        // Optional libraries used to extend on reveal.js
+        dependencies: [
+            { src: 'lib/js/classList.js', condition: function () {
+                return !document.body.classList;
+            } },
+            { src: 'plugin/zoom-js/zoom.js', async: true, condition: function () {
+                return !!document.body.classList;
+            } },
+            { src: 'plugin/notes/notes.js', async: true, condition: function () {
+                return !!document.body.classList;
+            } }
+        ]
+    });
+
+</script>
+</body>
+</html>
