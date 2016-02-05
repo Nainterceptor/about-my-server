@@ -1,0 +1,32 @@
+- hosts: Demo
+  user: root
+  roles:
+    - { role: Nainterceptor.common}
+  tasks:
+    - name: "Install httpd package"
+      yum: name={{ item }} state=present
+      with_items:
+        - httpd
+      notify:
+        - "Enable apache"
+
+    - name: "Replace httpd service"
+      copy: src=./files/httpd.service dest=/usr/lib/systemd/system/httpd.service
+      notify:
+        - "Restart apache"
+    - name: "Print debug message"
+      debug: msg="{{ inventory_hostname }} say hello to Algolia !"
+
+  handlers:
+    - name: "Restart apache"
+      service:
+        name: httpd
+        state: restarted
+      when: ansible_distribution == 'CentOS'
+
+    - name: "Enable apache"
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+      when: ansible_distribution == 'CentOS'
